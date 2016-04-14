@@ -1,1 +1,1 @@
-npm test
+npm test ./test/01-strings-tests.js
