@@ -7,8 +7,7 @@
 			"request": "launch",
 			"program": "${workspaceRoot}/node_modules/mocha/bin/_mocha",
 			"stopOnEntry": false,
-			"args": ["./test/03-date-tests.js"],
-			"cwd": "${workspaceRoot}",
+			"args": ["./test/04-arrays-tests.js"],
 			"preLaunchTask": null,
 			"runtimeExecutable": null,
 			"runtimeArgs": [
