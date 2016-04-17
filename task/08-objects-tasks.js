@@ -159,10 +159,13 @@ class Selector {
     }
     
     _default(needState, canReuse, mapValue) {
-        if (this.state > needState) {
-            throw new Error("You can't do that");
+        if (this.state == needState && !canReuse) {
+            throw new Error("Element, id and pseudo-element should not occur more then one time inside the selector");
         }
-        this.state = needState + !canReuse;
+        if (this.state > needState) {
+            throw new Error("Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element");
+        }
+        this.state = needState;
         this.str += mapValue;
         return this;      
     }
