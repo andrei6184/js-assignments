@@ -23,9 +23,13 @@
  *    console.log(r.getArea());   // => 200
  */
 function Rectangle(width, height) {
-    throw new Error('Not implemented');
+    this.width = width;
+    this.height = height;
 }
 
+Rectangle.prototype.getArea = function () {
+    return this.width * this.height;
+}
 
 /**
  * Returns the JSON representation of specified object
@@ -38,7 +42,7 @@ function Rectangle(width, height) {
  *    { width: 10, height : 20 } => '{"height":10,"width":20}'
  */
 function getJSON(obj) {
-    throw new Error('Not implemented');
+    return JSON.stringify(obj);
 }
 
 
@@ -54,7 +58,7 @@ function getJSON(obj) {
  *
  */
 function fromJSON(proto, json) {
-    throw new Error('Not implemented');
+    return Object.setPrototypeOf(JSON.parse(json), proto);
 }
 
 
@@ -107,35 +111,102 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-
+    
     element: function(value) {
-        throw new Error('Not implemented');
+        return new Selector().element(value);
     },
 
     id: function(value) {
-        throw new Error('Not implemented');
+        return new Selector().id(value);    
     },
 
     class: function(value) {
-        throw new Error('Not implemented');
+        return new Selector().class(value);
     },
 
     attr: function(value) {
-        throw new Error('Not implemented');
+        return new Selector().attr(value);
     },
 
     pseudoClass: function(value) {
-        throw new Error('Not implemented');
+        return new Selector().pseudoClass(value);
     },
 
     pseudoElement: function(value) {
-        throw new Error('Not implemented');
+        return new Selector().pseudoElement(value);
     },
 
     combine: function(selector1, combinator, selector2) {
-        throw new Error('Not implemented');
-    },
+        return new CombinedSelector(selector1, combinator, selector2);
+    }    
 };
+
+const SelectorState = {
+   empty: 0,
+   element: 1,
+   id: 2,
+   class: 3,
+   attr: 4,
+   pseudoClass: 5,
+   pseudoElement: 6,
+   full: 7 
+};
+
+class Selector {
+    constructor() {
+        this.str = '';
+        this.state = SelectorState.empty;
+    }
+    
+    _default(needState, canReuse, mapValue) {
+        if (this.state > needState) {
+            throw new Error("You can't do that");
+        }
+        this.state = needState + !canReuse;
+        this.str += mapValue;
+        return this;      
+    }
+    
+    element(value) { 
+        return this._default(SelectorState.element, false, value);
+    }
+    
+    id(value) {
+        return this._default(SelectorState.id, false, `#${value}`);
+    }
+    
+    class(value) {
+        return this._default(SelectorState.class, true, `.${value}`);
+    }
+    
+    attr(value) {
+        return this._default(SelectorState.attr, true, `[${value}]`);
+    }
+    
+    pseudoClass(value) {
+        return this._default(SelectorState.pseudoClass, true, `:${value}`);
+    }
+    
+    pseudoElement(value) {
+        return this._default(SelectorState.pseudoElement, false, `::${value}`);
+    }
+    
+    stringify() {
+        return this.str;
+    }    
+}
+
+class CombinedSelector {
+    constructor(selector1, combinator, selector2) {
+        this.selector1 = selector1;
+        this.combinator = combinator;
+        this.selector2 = selector2;
+    }
+    
+    stringify() {
+        return [this.selector1.stringify(), this.combinator, this.selector2.stringify()].join(' ');
+    }
+}
 
 
 module.exports = {
